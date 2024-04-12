@@ -20,7 +20,7 @@ source $HOME/.cargo/env
 
 # 克隆 Ore 项目
 echo "正在从 GitHub 克隆 Ore 项目..."
-git clone https://github.com/oresome/ore-cli.git
+git clone https://github.com/okeyzero/ore-cli.git
 cd ore-cli
 
 # 构建 Ore CLI
