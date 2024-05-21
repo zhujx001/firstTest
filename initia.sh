@@ -67,7 +67,7 @@ function install_node() {
     # 安装所有二进制文件
     git clone https://github.com/initia-labs/initia
     cd initia
-  
+   
     make install
     initiad version
 
@@ -76,8 +76,6 @@ function install_node() {
     initiad config set client chain-id initiation-1
 
     # 获取初始文件和地址簿
-	
-	
     wget -O $HOME/.initia/config/genesis.json https://initia.s3.ap-southeast-1.amazonaws.com/initiation-1/genesis.json
     wget -O $HOME/.initia/config/addrbook.json https://rpc-initia-testnet.trusted-point.com/addrbook.json
     sed -i -e "s|^minimum-gas-prices *=.*|minimum-gas-prices = \"0.15uinit,0.01uusdc\"|" $HOME/.initia/config/app.toml
@@ -98,7 +96,7 @@ function install_node() {
     cd slinky
 
     # checkout proper version
- 
+    git checkout v0.4.3
     
     make build
 
@@ -114,8 +112,7 @@ function install_node() {
     
     # 配置快照
     sudo apt install lz4 -y
-    
-	curl -o - -L https://snapshots.polkachu.com/testnet-snapshots/initia/initia_218063.tar.lz4 | lz4 -c -d - | tar -x -C $HOME/.initia
+    curl -o - -L https://snapshots.polkachu.com/testnet-snapshots/initia/initia_218063.tar.lz4 | lz4 -c -d - | tar -x -C $HOME/.initia
     mv $HOME/.initia/priv_validator_state.json.backup $HOME/.initia/data/priv_validator_state.json
     
     pm2 start ./build/slinky -- --oracle-config-path ./config/core/oracle.json --market-map-endpoint 0.0.0.0:53490
@@ -227,6 +224,7 @@ echo "升级到最新版本 $latest_tag 完成。"
 function main_menu() {
     while true; do
         clear
+       
         echo "================================================================"
         echo "节点社区 Telegram 群组:https://t.me/niuwuriji"
         echo "节点社区 Telegram 频道:https://t.me/niuwuriji"
