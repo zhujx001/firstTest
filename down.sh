@@ -109,31 +109,39 @@ install_go() {
 
 # 安装 NVM 并使用 NVM 安装 Node.js 和 npm
 install_nvm_node() {
-    echo "正在安装 NVM (Node Version Manager)..."
+    read -p "请输入要安装 Node.js 和 npm 的用户名: " username
 
-    # 安装依赖包
-    apt install -y build-essential libssl-dev
+    if id "$username" &>/dev/null; then
+        echo "正在为用户 $username 安装 NVM 和 Node.js..."
 
-    # 下载并安装 NVM
-    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+        sudo -u "$username" bash -c ' 
+            # 下载并安装 NVM
+            curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
 
-    # 加载 NVM 环境变量
-    export NVM_DIR="$HOME/.nvm"
-    # shellcheck source=/dev/null
-    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+            # 加载 NVM 环境变量
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-    # 安装最新的 LTS 版本 Node.js
-    echo "正在使用 NVM 安装最新的 LTS 版本 Node.js 和 npm..."
-    nvm install --lts
+            # 安装最新的 LTS 版本 Node.js
+            nvm install --lts
 
-    # 设置默认 Node.js 版本
-    nvm alias default node
+            # 设置默认 Node.js 版本
+            nvm alias default node
+        '
 
-    # 验证 Node.js 和 npm 安装
-    if node -v >/dev/null 2>&1 && npm -v >/dev/null 2>&1; then
-        echo "Node.js 和 npm 安装成功。"
+        # 验证安装
+        sudo -u "$username" bash -c ' 
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            if command -v node >/dev/null 2>&1 && command -v npm >/dev/null 2>&1; then 
+                echo "Node.js 和 npm 安装成功。"; 
+            else 
+                echo "Node.js 和 npm 安装失败。"; 
+            fi
+        '
     else
-        echo "Node.js 和 npm 安装失败。"
+        echo "用户 $username 不存在。"
     fi
 }
 
