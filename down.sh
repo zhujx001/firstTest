@@ -16,8 +16,8 @@ update_system() {
         echo "包列表更新成功。"
     else
         echo "包列表更新失败。请检查网络连接或APT配置。"
-        read -p "按任意键返回菜单..."
     fi
+    read -p "按任意键继续..."
 }
 
 # 安装基础工具
@@ -31,7 +31,7 @@ install_basic_tools() {
     else
         echo "基础工具安装失败。"
     fi
-    read -p "按任意键返回菜单..."
+    read -p "按任意键继续..."
 }
 
 # 安装 Docker 和 Docker Compose
@@ -44,7 +44,7 @@ install_docker() {
     apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
     if [ $? -ne 0 ]; then
         echo "安装必要的包失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -52,7 +52,7 @@ install_docker() {
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     if [ $? -ne 0 ]; then
         echo "添加 Docker GPG 密钥失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -62,7 +62,7 @@ install_docker() {
       $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
     if [ $? -ne 0 ]; then
         echo "设置 Docker 仓库失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -70,7 +70,7 @@ install_docker() {
     apt update -y
     if [ $? -ne 0 ]; then
         echo "包列表更新失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -78,7 +78,7 @@ install_docker() {
     apt install -y docker-ce docker-ce-cli containerd.io
     if [ $? -ne 0 ]; then
         echo "安装 Docker Engine 失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -91,7 +91,7 @@ install_docker() {
         echo "Docker 安装成功。"
     else
         echo "Docker 安装失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -99,14 +99,14 @@ install_docker() {
     DOCKER_COMPOSE_VERSION=$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '"' -f 4)
     if [ -z "$DOCKER_COMPOSE_VERSION" ]; then
         echo "获取 Docker Compose 版本失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
     curl -L "https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     if [ $? -ne 0 ]; then
         echo "下载 Docker Compose 失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -121,7 +121,7 @@ install_docker() {
     else
         echo "Docker Compose 安装失败。"
     fi
-    read -p "按任意键返回菜单..."
+    read -p "按任意键继续..."
 }
 
 # 安装 Go 1.23
@@ -137,7 +137,7 @@ install_go() {
     wget https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz -O /tmp/go${GO_VERSION}.linux-amd64.tar.gz
     if [ $? -ne 0 ]; then
         echo "下载 Go 二进制包失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -148,7 +148,7 @@ install_go() {
     tar -C /usr/local -xzf /tmp/go${GO_VERSION}.linux-amd64.tar.gz
     if [ $? -ne 0 ]; then
         echo "解压 Go 二进制包失败。"
-        read -p "按任意键返回菜单..."
+        read -p "按任意键继续..."
         return
     fi
 
@@ -169,7 +169,7 @@ install_go() {
 
     # 清理下载文件
     rm /tmp/go${GO_VERSION}.linux-amd64.tar.gz
-    read -p "按任意键返回菜单..."
+    read -p "按任意键继续..."
 }
 
 # 安装 NVM 并使用 NVM 安装 Node.js 和 npm
@@ -198,7 +198,7 @@ install_nvm_node() {
         '
         if [ $? -ne 0 ]; then
             echo "NVM 或 Node.js 安装过程中出错。"
-            read -p "按任意键返回菜单..."
+            read -p "按任意键继续..."
             return
         fi
 
@@ -216,7 +216,7 @@ install_nvm_node() {
     else
         echo "用户 $username 不存在。"
     fi
-    read -p "按任意键返回菜单..."
+    read -p "按任意键继续..."
 }
 
 # 显示菜单
@@ -233,35 +233,34 @@ show_menu() {
     echo "=============================="
 }
 
-# 主循环
-while true; do
-    show_menu
-    read -p "请输入选项 [1-5]: " choice
-    case $choice in
-        1)
-            update_system
-            install_basic_tools
-            ;;
-        2)
-            update_system
-            install_docker
-            ;;
-        3)
-            update_system
-            install_go
-            ;;
-        4)
-            update_system
-            install_nvm_node
-            ;;
-        5)
-            echo "退出脚本。"
-            exit 0
-            ;;
-        *)
-            echo "无效选项，请重新输入。"
-            read -p "按任意键继续..."
-            ;;
-    esac
-    echo ""
-done
+# 主执行
+show_menu
+read -p "请输入选项 [1-5]: " choice
+
+case $choice in
+    1)
+        update_system
+        install_basic_tools
+        ;;
+    2)
+        update_system
+        install_docker
+        ;;
+    3)
+        update_system
+        install_go
+        ;;
+    4)
+        update_system
+        install_nvm_node
+        ;;
+    5)
+        echo "退出脚本。"
+        exit 0
+        ;;
+    *)
+        echo "无效选项，请重新输入。"
+        read -p "按任意键退出..."
+        exit 1
+        ;;
+esac
