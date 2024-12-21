@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Function to install base utilities
+install_base_utilities() {
+    echo "Installing base utilities: make, screen, git..."
+    sudo apt update
+    sudo apt install -y make screen git
+    echo "Base utilities installed successfully."
+}
+
 # Function to install Docker and Docker-Compose
 install_docker() {
     echo "Installing Docker and Docker-Compose..."
@@ -17,6 +25,10 @@ install_node() {
     export NVM_DIR="$HOME/.nvm"
     [ -s "$NVM_DIR/nvm.sh" ] && \ . "$NVM_DIR/nvm.sh"  # Load nvm
     [ -s "$NVM_DIR/bash_completion" ] && \ . "$NVM_DIR/bash_completion"  # Load nvm bash_completion
+
+    # Reload shell to ensure NVM is available
+    source "$NVM_DIR/nvm.sh"
+    source ~/.bashrc
 
     nvm install --lts
     nvm use --lts
@@ -37,12 +49,16 @@ install_go() {
 
 # Display menu and handle user input
 echo "Select the software to install:"
+echo "0. Install base utilities (make, screen, git)"
 echo "1. Install Docker and Docker-Compose"
 echo "2. Install Node.js, npm, and PM2 using NVM"
 echo "3. Install Go 1.23"
 read -p "Enter your choice: " choice
 
 case $choice in
+    0)
+        install_base_utilities
+        ;;
     1)
         install_docker
         ;;
