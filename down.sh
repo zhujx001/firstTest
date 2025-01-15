@@ -1,77 +1,161 @@
 #!/bin/bash
 
+# Function to check if a command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
 # Function to install base utilities
 install_base_utilities() {
     echo "Installing base utilities: make, screen, git..."
-    sudo apt update
-    sudo apt install -y make screen git
+    if ! sudo apt update; then
+        echo "Failed to update package lists"
+        return 1
+    fi
+    
+    if ! sudo apt install -y make screen git; then
+        echo "Failed to install base utilities"
+        return 1
+    fi
+    
     echo "Base utilities installed successfully."
 }
 
 # Function to install Docker and Docker-Compose
 install_docker() {
+    if command_exists docker; then
+        echo "Docker is already installed. Skipping..."
+        return 0
+    fi
+
     echo "Installing Docker and Docker-Compose..."
-    sudo apt update
-    sudo apt install -y docker.io docker-compose
+    if ! sudo apt update; then
+        echo "Failed to update package lists"
+        return 1
+    fi
+    
+    if ! sudo apt install -y docker.io docker-compose; then
+        echo "Failed to install Docker"
+        return 1
+    fi
+    
     sudo systemctl enable --now docker
-    sudo usermod -aG docker $USER
+    sudo usermod -aG docker "$USER"
     echo "Docker and Docker-Compose installed successfully. Please log out and log back in for Docker permissions to take effect."
 }
 
 # Function to install Node.js, npm, and PM2 using NVM
 install_node() {
+    if command_exists nvm; then
+        echo "NVM is already installed. Skipping..."
+        return 0
+    fi
+
     echo "Installing Node.js, npm, and PM2..."
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+    
+    # Install NVM
+    if ! curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash; then
+        echo "Failed to install NVM"
+        return 1
+    fi
+
+    # Source NVM scripts
     export NVM_DIR="$HOME/.nvm"
-    [ -s "$NVM_DIR/nvm.sh" ] && \ . "$NVM_DIR/nvm.sh"  # Load nvm
-    [ -s "$NVM_DIR/bash_completion" ] && \ . "$NVM_DIR/bash_completion"  # Load nvm bash_completion
+    # shellcheck source=/dev/null
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-    # Reload shell to ensure NVM is available
-    source "$NVM_DIR/nvm.sh"
-    source ~/.bashrc
+    # Install latest LTS Node.js
+    if ! nvm install --lts; then
+        echo "Failed to install Node.js LTS"
+        return 1
+    fi
 
-    nvm install --lts
     nvm use --lts
-    npm install -g pm2
+    
+    # Install PM2
+    if ! npm install -g pm2; then
+        echo "Failed to install PM2"
+        return 1
+    fi
+
     echo "Node.js, npm, and PM2 installed successfully."
 }
 
-# Function to install Go 1.23
+# Function to install Go
 install_go() {
+    if command_exists go; then
+        echo "Go is already installed. Skipping..."
+        return 0
+    fi
+
     echo "Installing Go 1.23..."
-    wget https://golang.org/dl/go1.23.4.linux-amd64.tar.gz
-    sudo tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
-    echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
-    source ~/.bashrc
-    rm go1.23.4.linux-amd64.tar.gz
-    echo "Go 1.23 installed successfully."
+    
+    # Download Go
+    GO_VERSION="1.23.4"
+    GO_DOWNLOAD_URL="https://golang.org/dl/go${GO_VERSION}.linux-amd64.tar.gz"
+    
+    if ! wget "$GO_DOWNLOAD_URL"; then
+        echo "Failed to download Go"
+        return 1
+    fi
+
+    # Remove existing Go installation if exists
+    if [ -d "/usr/local/go" ]; then
+        sudo rm -rf /usr/local/go
+    fi
+
+    # Install Go
+    if ! sudo tar -C /usr/local -xzf "go${GO_VERSION}.linux-amd64.tar.gz"; then
+        echo "Failed to extract Go"
+        return 1
+    fi
+
+    # Add to PATH if not already present
+    if ! grep -q "/usr/local/go/bin" ~/.bashrc; then
+        echo "export PATH=\$PATH:/usr/local/go/bin" >> ~/.bashrc
+        source ~/.bashrc
+    fi
+
+    # Clean up downloaded tarball
+    rm "go${GO_VERSION}.linux-amd64.tar.gz"
+
+    echo "Go ${GO_VERSION} installed successfully."
 }
 
-# Display menu and handle user input
-echo "Select the software to install:"
-echo "0. Install base utilities (make, screen, git)"
-echo "1. Install Docker and Docker-Compose"
-echo "2. Install Node.js, npm, and PM2 using NVM"
-echo "3. Install Go 1.23"
-read -p "Enter your choice: " choice
+# Main menu
+main() {
+    echo "Select the software to install:"
+    echo "0. Install base utilities (make, screen, git)"
+    echo "1. Install Docker and Docker-Compose"
+    echo "2. Install Node.js, npm, and PM2 using NVM"
+    echo "3. Install Go 1.23"
+    echo "4. Exit"
+    read -p "Enter your choice (0-4): " choice
 
-case $choice in
-    0)
-        install_base_utilities
-        ;;
-    1)
-        install_docker
-        ;;
-    2)
-        install_node
-        ;;
-    3)
-        install_go
-        ;;
-    *)
-        echo "Invalid choice. Exiting."
-        ;;
-esac
+    case $choice in
+        0)
+            install_base_utilities
+            ;;
+        1)
+            install_docker
+            ;;
+        2)
+            install_node
+            ;;
+        3)
+            install_go
+            ;;
+        4)
+            echo "Exiting script."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice. Please select a valid option."
+            main
+            ;;
+    esac
+}
 
-# Add placeholder for future extensions
-echo "Installation complete or exited. You can extend this script by adding more options."
+# Run the main function
+main
