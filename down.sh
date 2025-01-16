@@ -19,6 +19,7 @@ install_base_utilities() {
     fi
     
     echo "Base utilities installed successfully."
+    main
 }
 
 # Function to install Docker and Docker-Compose
@@ -42,6 +43,7 @@ install_docker() {
     sudo systemctl enable --now docker
     sudo usermod -aG docker "$USER"
     echo "Docker and Docker-Compose installed successfully. Please log out and log back in for Docker permissions to take effect."
+    main
 }
 
 # Function to install Node.js, npm, and PM2 using NVM
@@ -80,6 +82,7 @@ install_node() {
     fi
 
     echo "Node.js, npm, and PM2 installed successfully."
+    main
 }
 
 # Function to install Go
@@ -121,6 +124,7 @@ install_go() {
     rm "go${GO_VERSION}.linux-amd64.tar.gz"
 
     echo "Go ${GO_VERSION} installed successfully."
+    main
 }
 
 # Function to install Python and venv
@@ -144,10 +148,12 @@ install_python() {
     
     echo "Python and venv installed successfully."
     echo "To create a new virtual environment, use: python3 -m venv <env_name>"
+    main
 }
 
 # Main menu function
-show_menu() {
+main() {
+    clear
     echo "Select the software to install:"
     echo "0. Install base utilities (make, screen, git)"
     echo "1. Install Docker and Docker-Compose"
@@ -155,43 +161,33 @@ show_menu() {
     echo "3. Install Go 1.23"
     echo "4. Install Python and venv"
     echo "5. Exit"
-}
+    read -p "Enter your choice (0-5): " choice
 
-# Main function
-main() {
-    while true; do
-        show_menu
-        read -p "Enter your choice (0-5): " choice
-        
-        case $choice in
-            0)
-                install_base_utilities
-                ;;
-            1)
-                install_docker
-                ;;
-            2)
-                install_node
-                ;;
-            3)
-                install_go
-                ;;
-            4)
-                install_python
-                ;;
-            5)
-                echo "Exiting script."
-                exit 0
-                ;;
-            *)
-                echo "Invalid choice. Please select a valid option."
-                ;;
-        esac
-        
-        echo
-        read -p "Press Enter to continue..."
-        clear
-    done
+    case $choice in
+        0)
+            install_base_utilities
+            ;;
+        1)
+            install_docker
+            ;;
+        2)
+            install_node
+            ;;
+        3)
+            install_go
+            ;;
+        4)
+            install_python
+            ;;
+        5)
+            echo "Exiting script."
+            exit 0
+            ;;
+        *)
+            echo "Invalid choice. Please select a valid option."
+            main
+            ;;
+    esac
 }
 
 # Run the main function
