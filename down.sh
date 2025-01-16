@@ -19,6 +19,8 @@ install_base_utilities() {
     fi
     
     echo "Base utilities installed successfully."
+    echo "Press Enter to return to main menu..."
+    read
     main
 }
 
@@ -26,6 +28,9 @@ install_base_utilities() {
 install_docker() {
     if command_exists docker; then
         echo "Docker is already installed. Skipping..."
+        echo "Press Enter to return to main menu..."
+        read
+        main
         return 0
     fi
 
@@ -43,6 +48,8 @@ install_docker() {
     sudo systemctl enable --now docker
     sudo usermod -aG docker "$USER"
     echo "Docker and Docker-Compose installed successfully. Please log out and log back in for Docker permissions to take effect."
+    echo "Press Enter to return to main menu..."
+    read
     main
 }
 
@@ -50,6 +57,9 @@ install_docker() {
 install_node() {
     if command_exists nvm; then
         echo "NVM is already installed. Skipping..."
+        echo "Press Enter to return to main menu..."
+        read
+        main
         return 0
     fi
 
@@ -82,6 +92,8 @@ install_node() {
     fi
 
     echo "Node.js, npm, and PM2 installed successfully."
+    echo "Press Enter to return to main menu..."
+    read
     main
 }
 
@@ -89,6 +101,9 @@ install_node() {
 install_go() {
     if command_exists go; then
         echo "Go is already installed. Skipping..."
+        echo "Press Enter to return to main menu..."
+        read
+        main
         return 0
     fi
 
@@ -124,6 +139,8 @@ install_go() {
     rm "go${GO_VERSION}.linux-amd64.tar.gz"
 
     echo "Go ${GO_VERSION} installed successfully."
+    echo "Press Enter to return to main menu..."
+    read
     main
 }
 
@@ -148,6 +165,8 @@ install_python() {
     
     echo "Python and venv installed successfully."
     echo "To create a new virtual environment, use: python3 -m venv <env_name>"
+    echo "Press Enter to return to main menu..."
+    read
     main
 }
 
@@ -161,6 +180,8 @@ main() {
     echo "3. Install Go 1.23"
     echo "4. Install Python and venv"
     echo "5. Exit"
+    
+    # Wait for user input
     read -p "Enter your choice (0-5): " choice
 
     case $choice in
@@ -184,7 +205,8 @@ main() {
             exit 0
             ;;
         *)
-            echo "Invalid choice. Please select a valid option."
+            echo "Invalid choice. Press Enter to try again..."
+            read
             main
             ;;
     esac
