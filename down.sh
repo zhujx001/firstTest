@@ -123,38 +123,75 @@ install_go() {
     echo "Go ${GO_VERSION} installed successfully."
 }
 
-# Main menu
-main() {
+# Function to install Python and venv
+install_python() {
+    echo "Installing Python and venv..."
+    
+    if ! sudo apt update; then
+        echo "Failed to update package lists"
+        return 1
+    fi
+    
+    # Install Python 3 and venv
+    if ! sudo apt install -y python3 python3-pip python3-venv; then
+        echo "Failed to install Python and venv"
+        return 1
+    fi
+    
+    # Verify installations
+    python3 --version
+    pip3 --version
+    
+    echo "Python and venv installed successfully."
+    echo "To create a new virtual environment, use: python3 -m venv <env_name>"
+}
+
+# Main menu function
+show_menu() {
     echo "Select the software to install:"
     echo "0. Install base utilities (make, screen, git)"
     echo "1. Install Docker and Docker-Compose"
     echo "2. Install Node.js, npm, and PM2 using NVM"
     echo "3. Install Go 1.23"
-    echo "4. Exit"
-    read -p "Enter your choice (0-4): " choice
+    echo "4. Install Python and venv"
+    echo "5. Exit"
+}
 
-    case $choice in
-        0)
-            install_base_utilities
-            ;;
-        1)
-            install_docker
-            ;;
-        2)
-            install_node
-            ;;
-        3)
-            install_go
-            ;;
-        4)
-            echo "Exiting script."
-            exit 0
-            ;;
-        *)
-            echo "Invalid choice. Please select a valid option."
-            main
-            ;;
-    esac
+# Main function
+main() {
+    while true; do
+        show_menu
+        read -p "Enter your choice (0-5): " choice
+        
+        case $choice in
+            0)
+                install_base_utilities
+                ;;
+            1)
+                install_docker
+                ;;
+            2)
+                install_node
+                ;;
+            3)
+                install_go
+                ;;
+            4)
+                install_python
+                ;;
+            5)
+                echo "Exiting script."
+                exit 0
+                ;;
+            *)
+                echo "Invalid choice. Please select a valid option."
+                ;;
+        esac
+        
+        echo
+        read -p "Press Enter to continue..."
+        clear
+    done
 }
 
 # Run the main function
