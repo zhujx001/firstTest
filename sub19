@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# 克隆仓库
+git clone https://github.com/rayonlabs/vision-workers.git
+cd vision-workers
+
+# 运行引导脚本
+sudo -E ./bootstrap.sh
+
+# 检查vision auto-updater状态
+sudo systemctl status vision-autoupdater
+
+# 拉取Docker镜像
+docker pull corcelio/vision:image_server-latest
+
+# 运行Docker容器
+docker run --rm -d -v COMFY:/app/image_server/ComfyUI -v HF:/app/cache -p 6919:6919 --runtime=nvidia --gpus '"device=0"' -e PORT=6919 -e DEVICE=0 corcelio/vision:image_server-latest
+
+# 设置环境变量
+export VRAM_MODE=--normalvram
+export WARMUP=true
+export PORT=6919
+export DEVICE=0
+
+# 启动容器
+docker run --rm -d -v COMFY:/app/image_server/ComfyUI -v HF:/app/cache -p 6919:6919 --runtime=nvidia --gpus '"device=0"' -e PORT=6919 -e DEVICE=0 corcelio/vision:image_server-latest
