@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Clone the repo
+git clone https://github.com/namoray/nineteen.git
+cd nineteen
+
+# Install system dependencies
+NO_LAUNCH=1 sudo -E ./bootstrap.sh
+source $HOME/.bashrc
+
+# Uninstall bittensor (optional)
+pip uninstall bittensor
+
+# Install fiber
+pip install git+https://github.com/rayonlabs/fiber.git@2.1.0
+
+# Create config
+python core/create_config.py --miner
+
+# Post IP's to chain
+fiber-post-ip --netuid 176 --subtensor.network test --external_port 1234 --wallet.name default --wallet.hotkey default --external_ip 0.0.0.0
+
+# Start miners
+uvicorn miner.server:app --reload --host 0.0.0.0 --port 1234 --env-file .default.env --log-level debug &
