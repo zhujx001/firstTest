@@ -43,9 +43,7 @@ echo "Setting up Compute-Subnet repository..."
 git clone https://github.com/neuralinternet/Compute-Subnet.git
 cd Compute-Subnet
 sudo apt -y install ocl-icd-libopencl1 pocl-opencl-icd
-python3 -m pip install -r requirements.txt
-python3 -m pip install --no-deps -r requirements-compute.txt
-python3 -m pip install -e .
+
 
 # 8. Configure environment
 echo "Configuring environment..."
@@ -61,6 +59,11 @@ sudo systemctl start docker
 sudo ufw allow 4444
 sudo ufw allow 22/tcp
 sudo ufw allow 10:65535/tcp
+cd
+cd Compute-Subnet
+python3 -m pip install -r requirements.txt
+python3 -m pip install --no-deps -r requirements-compute.txt
+python3 -m pip install -e .
 echo "Enable UFW now? You will need to confirm interactively."
 sudo ufw enable  # Interactive step
 
