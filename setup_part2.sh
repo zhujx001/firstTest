@@ -64,7 +64,7 @@ cd Compute-Subnet
 python3 -m pip install -r requirements.txt
 python3 -m pip install --no-deps -r requirements-compute.txt
 python3 -m pip install -e .
-echo "Enable UFW now? You will need to confirm interactively."
-sudo ufw enable  # Interactive step
+# echo "Enable UFW now? You will need to confirm interactively."
+# sudo ufw enable  # Interactive step
 
-echo "Setup part 2 completed successfully."
+echo "Setup part 2 completed successfully. please run sudo ufw enable"
