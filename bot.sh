@@ -106,8 +106,8 @@ download_extract_bot() {
   wget -O /tmp/CC-BOT.zip https://github.com/zhujx001/firstTest/releases/download/v1.0/CC-BOT.zip
 
   echo "📂 Extracting CC-BOT package..."
-  mkdir -p /root/CC-BOT
-  unzip -o /tmp/CC-BOT.zip -d /root/CC-BOT
+
+  unzip -o /tmp/CC-BOT.zip -d /root
 
   echo "🔐 Setting execution permissions for cc-arbitrage-bot..."
   chmod +x /root/CC-BOT/cc-arb-executable/cc-arbitrage-bot
